@@ -11,8 +11,38 @@ use MediaWiki\Linker\LinkRenderer;
 use MediaWiki\Page\PageProps;
 use MediaWiki\Page\PageStore;
 use MediaWiki\Parser\Parser;
+use MediaWiki\Parser\Sanitizer;
 
 class Hooks implements ParserFirstCallInitHook, CategoryViewer__generateLinkHook {
+	private const BAD_TAGS = [
+		'h1',
+		'h2',
+		'h3',
+		'h4',
+		'h5',
+		'h6',
+		'div',
+		'blockquote',
+		'ol',
+		'ul',
+		'li',
+		'hr',
+		'table',
+		'tr',
+		'th',
+		'td',
+		'dl',
+		'dd',
+		'caption',
+		'p',
+		'ruby',
+		'rb',
+		'rt',
+		'rtc',
+		'rp',
+		'br'
+	];
+
 	private JsonCodec $jsonCodec;
 	private LinkRenderer $linkRenderer;
 	private PageStore $pageStore;
@@ -75,6 +105,12 @@ class Hooks implements ParserFirstCallInitHook, CategoryViewer__generateLinkHook
 		?string $category = null,
 		?string $flags = null
 	): string|array {
+		$title = $parser->doQuotes( $title );
+		$title = $parser->killMarkers( $title );
+		$title = Sanitizer::removeSomeTags( $title, [
+			'removeTags' => self::BAD_TAGS,
+		] );
+
 		if ( $category === null ) {
 			return self::generateError( $parser, 'displaycat-error-missing-category' );
 		}
