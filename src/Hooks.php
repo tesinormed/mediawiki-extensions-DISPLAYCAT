@@ -2,6 +2,7 @@
 
 namespace MediaWiki\Extension\DISPLAYCAT;
 
+use HtmlArmor;
 use MediaWiki\Context\RequestContext;
 use MediaWiki\Extension\DisplayTitle\DisplayTitleService;
 use MediaWiki\Hook\CategoryViewer__generateLinkHook;
@@ -86,12 +87,12 @@ class Hooks implements ParserFirstCallInitHook, CategoryViewer__generateLinkHook
 		// get the category DB key to category display title map
 		$property = $this->pageProps->getProperties( $title, 'displaycat' );
 		// default to the display title of the page
-		$this->displayTitleService->getDisplayTitle( $title, $text );
+		$this->displayTitleService->getDisplayTitle( $title, $text, wrap: true );
 		if ( array_key_exists( $id, $property ) ) {
 			$property = $this->jsonCodec->deserialize( $property[$id] );
 			if ( array_key_exists( $categoryTitle->getDBkey(), $property ) ) {
 				// there is a set category display title, use it
-				$text = $property[$categoryTitle->getDBkey()];
+				$text = new HtmlArmor( $property[$categoryTitle->getDBkey()] );
 			}
 		}
 		// change the link
@@ -104,7 +105,10 @@ class Hooks implements ParserFirstCallInitHook, CategoryViewer__generateLinkHook
 		string $title,
 		?string $category = null,
 		?string $flags = null
-	): string|array {
+	): string {
+		$magicWords = $parser->getMagicWordFactory()->newArray( [ 'displaycat_noerror', 'displaycat_noreplace' ] );
+		$flags = $magicWords->matchStartToEnd( $flags );
+
 		$title = $parser->doQuotes( $title );
 		$title = $parser->killMarkers( $title );
 		$title = Sanitizer::removeSomeTags( $title, [
@@ -127,7 +131,7 @@ class Hooks implements ParserFirstCallInitHook, CategoryViewer__generateLinkHook
 		$previous = $this->jsonCodec->deserialize( $previous );
 
 		// if this hasn't been set before or we're suppressing errors
-		if ( !array_key_exists( $categoryTitle->getDBkey(), $previous ) || $flags === 'noerror' ) {
+		if ( !array_key_exists( $categoryTitle->getDBkey(), $previous ) || $flags === 'displaycat_noerror' ) {
 			// append it to the list
 			$parser->getOutput()->setPageProperty(
 				'displaycat',
@@ -137,7 +141,7 @@ class Hooks implements ParserFirstCallInitHook, CategoryViewer__generateLinkHook
 		}
 
 		// if we're not replacing previous set category display titles
-		if ( $flags === 'noreplace' ) {
+		if ( $flags === 'displaycat_noreplace' ) {
 			// do nothing
 			return '';
 		}
