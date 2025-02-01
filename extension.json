@@ -1,0 +1,48 @@
+{
+	"name": "DISPLAYCAT",
+	"version": "0.1.0",
+	"author": [
+		"tesinormed"
+	],
+	"url": "https://www.mediawiki.org/wiki/Extension:DISPLAYCAT",
+	"descriptionmsg": "displaycat-desc",
+	"license-name": "CC0-1.0",
+	"type": "parserhook",
+	"requires": {
+		"MediaWiki": ">= 1.43.0",
+		"extensions": {
+			"DisplayTitle": "*"
+		},
+		"platform": {
+			"php": ">= 8.1"
+		}
+	},
+	"AutoloadNamespaces": {
+		"MediaWiki\\Extension\\DISPLAYCAT\\": "src/"
+	},
+	"HookHandlers": {
+		"main": {
+			"class": "MediaWiki\\Extension\\DISPLAYCAT\\Hooks",
+			"services": [
+				"JsonCodec",
+				"LinkRenderer",
+				"PageStore",
+				"PageProps",
+				"DisplayTitleService"
+			]
+		}
+	},
+	"Hooks": {
+		"ParserFirstCallInit": "main",
+		"CategoryViewer::generateLink": "main"
+	},
+	"MessagesDirs": {
+		"DISPLAYCAT": [
+			"i18n"
+		]
+	},
+	"ExtensionMessagesFiles": {
+		"DISPLAYCATMagic": "DISPLAYCAT.i18n.magic.php"
+	},
+	"manifest_version": 2
+}

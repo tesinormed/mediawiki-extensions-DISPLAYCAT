@@ -1,0 +1,13 @@
+{
+	"@metadata": {
+		"authors": [
+			"tesinormed"
+		]
+	},
+	"displaycat-desc": "Adds support for custom display titles on specific category pages",
+	"displaycat-error-missing-category": "<code><nowiki>{{DISPLAYCAT}}</nowiki></code>: category is missing",
+	"displaycat-error-invalid-category": "<code><nowiki>{{DISPLAYCAT}}</nowiki></code>: category <code>$1</code> is invalid",
+	"displaycat-error-already-specified": "<code><nowiki>{{DISPLAYCAT}}</nowiki></code>: category display title was already specified for category <code>$1</code>",
+	"displaycat-page-error-category": "Pages with ignored category display titles",
+	"displaycat-page-error-category-desc": "The page has an ignored <code><nowiki>{{DISPLAYCAT}}</nowiki></code> because it is specified incorrectly."
+}
